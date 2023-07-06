@@ -1,3 +1,9 @@
+```
+This repo is a quick scratch to automatically generate changeset and tagsets.
+Look at line 194 in praxi.py. Uncomment this part when need to generate tagset using all changesets.
+To run begin with Untitled-1.ipynb. 
+```
+
 # AI for cloud ops
 
 BU faculty members Ayse Coskun, Alan Liu, and Gianluca Stringhini, along with Red Hat researcher Marcel Hild will pursue work at the intersection of artificial intelligence (AI) and cloud systems through this joint project, ai-for-cloud-ops. 
