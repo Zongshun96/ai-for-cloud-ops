@@ -172,12 +172,14 @@ def iterative_experiment(train_path, test_path, resfile_name,
             logging.error("No tagsets found in provided training directory")
             raise ValueError("No tagsets in training directory!")
         train_tags, train_labels = parse_ts(train_names, train_path)
+        print("train_labels", set(train_labels))
     if not just_train:
         test_names = [f for f in listdir(test_path) if (isfile(join(test_path, f)) and f[-3:]=='tag')]
         if(len(test_names) == 0):
             logging.error("No tagsets found in provided testing directory")
             raise ValueError("No tagsets in testing directory!")
         test_tags, test_labels = parse_ts(test_names, test_path)
+        print("test_labels", set(test_labels))
 
     resfile = open(resfile_name, 'wb')
     results = []
@@ -191,12 +193,12 @@ def iterative_experiment(train_path, test_path, resfile_name,
         # May not be needed in the future because prediction may occur on ML as a service server
         if print_misses:
             print("Predicting labels:")
-            # hard coded prediction for when ML as a service is integrated to Praxi magic
-            print("label: <timestamp> prediction: <prediction>")
+            # # hard coded prediction for when ML as a service is integrated to Praxi magic
+            # print("label: <timestamp> prediction: <prediction>")
             # original code for predicting label from within local device
-            # for label, pred in zip(labels, preds):
-                # if label != pred:
-                    # print('label:',label,'prediction:',pred)
+            for label, pred in zip(labels, preds):
+                if label != pred:
+                    print('label:',label,'prediction:',pred)
 
         # save and print results
         pickle.dump(results, resfile)
@@ -567,13 +569,13 @@ if __name__ == '__main__':
     # run a single label experiment by default, if --multi flag is added, run a multilabel experiment!
     parser.add_argument('-m','--multi', dest='experiment', action='store_const', const='multi',
                         default='single', help="Type of experiment to run (single-label default).")
-    parser.add_argument('-w','--vwargs', dest='vw_args', default='-b 26 --learning_rate 1.5 --passes 10',
+    parser.add_argument('-w','--vwargs', dest='vw_args', default='-b 26 --learning_rate 1.5 --passes 30',
                         help="custom arguments for VW.")
     parser.add_argument('-n', '--nfolds', help='number of folds to use in cross validation', default=1) # make default 1?
     parser.add_argument('-f', '--fullres', help='generate full result file.', dest='result',
                         action='store_const', const='full', default='summary')
     parser.add_argument('-v', '--verbosity', dest='loglevel', action='store_const', const='DEBUG',
-                        default='WARNING',help='specify level of detail for log file')
+                        default='INFO',help='specify level of detail for log file')
     # IMPLEMENT THIS!
     parser.add_argument('-l' '--labels', dest='print_labels', action='store_const', const=True, default=False,
                         help='Print missed labels')
@@ -597,6 +599,7 @@ if __name__ == '__main__':
     loglevel = args['loglevel']
     stub = 'praxi_exp'
     logfile_name = get_free_filename(stub, outdir, '.log')
+    print("main", logfile_name)
 
     numeric_level = getattr(logging, loglevel, None)
     logging.basicConfig(filename=logfile_name,level=numeric_level)

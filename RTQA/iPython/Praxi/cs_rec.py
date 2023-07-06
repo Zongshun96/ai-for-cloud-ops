@@ -29,12 +29,14 @@ def get_free_filename(stub, directory, suffix=''):
             if suffix=='.p':
                 print("will create pickle file")
             elif suffix:
+                print("get_free_filename", file_candidate)
                 Path(file_candidate).touch()
             else:
+                print("get_free_filename no suffix")
                 Path(file_candidate).mkdir()
             return file_candidate
 
-def json_to_yaml(fname, yamlname, label=None):
+def json_to_yaml(fname, yamlname, labels=None):
     with open(fname) as json_file:
         data = json.load(json_file)
 
@@ -52,10 +54,11 @@ def json_to_yaml(fname, yamlname, label=None):
         changes.add(f_create['filename'])
 
     changes = list(changes)
-
     # create dictionary and save to yaml file
-    yaml_in = {'open_time': open_time, 'close_time': close_time, 'label': label, 'changes': changes}
+    yaml_in = {'open_time': open_time, 'close_time': close_time, 'labels': labels, 'changes': changes}
     with open(yamlname, 'w') as outfile:
+        print("gen_changeset", os.path.dirname(outfile.name))
+        print("gen_changeset", yamlname)
         yaml.dump(yaml_in, outfile, default_flow_style=False)
 
 if __name__ == '__main__':
@@ -63,17 +66,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Arguments for Praxi software discovery algorithm.')
 
     parser.add_argument('-t','--targetdir', help='Path to target directory.', required=True)
-    parser.add_argument('-l', '--label', help='Application label', required=True)
+    parser.add_argument('-l', '--label', nargs="*", type=str, default=['pandas', 'matplotlib'], help='Application label', required=True)
 
     args = vars(parser.parse_args())
 
     targetdir = args['targetdir']
-    label = args['label']
-    yaml_name = get_free_filename(label, targetdir, suffix='.yaml')
+    labels = args['label']
+    print("label, targetdir", labels, targetdir)
+    yaml_name = get_free_filename("-".join(labels), targetdir, suffix='.yaml')
 
     # Get linux watch path 
     # watch_path = sysconfig.get_paths()["purelib"]
-    watch_path = '/home/' + getpass.getuser() + '/.local/lib/python3.8/site-packages/'
+    watch_path = '/home/' + getpass.getuser() + '/Praxi-study/ai-for-cloud-ops/RTQA/iPython/.venv/lib/python3.9/site-packages/'
 
     print("Watching:" + watch_path)
     watch_paths = [watch_path]
@@ -88,7 +92,7 @@ if __name__ == '__main__':
     print(cs)
     io.save_object_as_json(cs, 'cs.dscs')
 
-    json_to_yaml('cs.dscs', yaml_name, label=label)
+    json_to_yaml('cs.dscs', yaml_name, labels=labels)
 
     # Remove json file
     os.remove("cs.dscs")

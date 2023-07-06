@@ -146,6 +146,8 @@ def create_files(tagset_names, ts_dir, labels, ids, tags):
             cur_dict = {'label': labels[i], 'id': ids, 'tags': tags[i]}
         cur_fname = ts_dir + '/' + tagset_name
         with open(cur_fname, 'w') as outfile:
+            print("gen_tagset", os.path.dirname(outfile.name))
+            print("gen_tagset", cur_fname)
             yaml.dump(cur_dict, outfile, default_flow_style=False)
 
 

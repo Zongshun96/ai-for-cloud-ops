@@ -89,12 +89,19 @@ class ExecutionMagics(Magics):
             expr = self.shell.transform_cell(cell)
         else:
             expr = self.shell.transform_cell(line)
+        print("decorated expr", expr, type(expr))
+
+        package_names = []
+        for term in reversed(line.split(" ")):
+            if term == "install":
+                break
+            package_names.append(term)
 
 
         # Get time praxi magic was run in order to name TEMP files and clean cache
         nowTime = datetime.now()
         time_string = nowTime.strftime("%d%m%Y.%H%M%S")
-        praxiCacheClean()
+        # praxiCacheClean()
 
         # Minimum time above which parse time will be reported
         tp_min = 0.1
@@ -102,15 +109,18 @@ class ExecutionMagics(Magics):
         t0 = clock()
         expr_ast = self.shell.compile.ast_parse(expr)
         tp = clock()-t0
+        print("decorated expr_ast", expr_ast)
 
         # Apply AST transformations
         expr_ast = self.shell.transform_ast(expr_ast)
+        print("decorated expr_ast.body", expr_ast.body)
 
         # Minimum time above which compilation time will be reported
         tc_min = 0.1
         dirname = os.path.dirname(__file__)
         # Start Deltashocker filesystem change recorder
-        p = subprocess.Popen(['python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(dirname, 'changesets'),'-l',time_string], stdin=subprocess.PIPE)
+        # p = subprocess.Popen(['python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(dirname, 'changesets'),'-l',time_string], stdin=subprocess.PIPE)
+        p = subprocess.Popen(['python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(dirname, 'changesets'),'-l', *package_names], stdin=subprocess.PIPE)
 
         expr_val=None
         if len(expr_ast.body)==1 and isinstance(expr_ast.body[0], ast.Expr):
@@ -130,6 +140,7 @@ class ExecutionMagics(Magics):
         t0 = clock()
         code = self.shell.compile(expr_ast, source, mode)
         tc = clock()-t0
+        print("decorated code", code)
 
         # skew measurement as little as possible
         glob = self.shell.user_ns
@@ -179,13 +190,31 @@ class ExecutionMagics(Magics):
 
         p.communicate(input=b'\n')
 
-        p2 = subprocess.Popen(['python3', os.path.join(dirname, 'tagset_gen.py'),'-c',os.path.join(dirname, 'changesets'),'-t',os.path.join(dirname, 'tagsets')], stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
-        # main.py generates a trains a new model everytime from scratch from the tagsets it is given
-        # demo_tagsets/<tagset_directory> is what vw is testing against the sample
-        p3 = subprocess.Popen(['python3', os.path.join(dirname, 'main.py'),'-t',os.path.join(dirname, 'demo_tagsets/ml_test_tag'),
-            '-s',os.path.join(dirname, 'tagsets'),'-o',os.path.join(dirname, 'results'), '-i', os.path.join(dirname, 'iter_model.vw'), '-l'], 
-            stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
-       
+        
+        # # tagset generator
+        # p2 = subprocess.Popen(['python3', os.path.join(dirname, 'tagset_gen.py'),'-c',os.path.join(dirname, 'changesets'),'-t',os.path.join(dirname, 'tagsets')], stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        # # main.py generates a trains a new model everytime from scratch from the tagsets it is given
+        # # demo_tagsets/<tagset_directory> is what vw is testing against the sample
+        # p2.communicate()
+
+        # # predictions generator
+        # p3 = subprocess.Popen(['python3', os.path.join(dirname, 'main.py'),'-t',os.path.join(dirname, 'demo_tagsets/sl_train_tag'),
+        #     '-s',os.path.join(dirname, 'tagsets'),'-o',os.path.join(dirname, 'results'), '-i', os.path.join(dirname, 'iter_model.vw'), '-l'], 
+        #     stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+        # (output, err) = p3.communicate()
+        # print(output, err)
+        # print("!!!!!!!!!!!! p3 Curl start!!!!!")
+        # # curl --header "Content-Type: application/json" --data "{'test':'test'}" --request POST http://10.106.160.36:6025/train/
+        # p3 = subprocess.Popen(['curl', "--header","Content-Type: application/json",'--data',"{'test':'test'}", "--request", "POST", "http://10.106.160.36:6025/train/"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        # # p3 = subprocess.Popen(['python3', os.path.join(dirname, 'main.py'),'-t',os.path.join(dirname, 'tagsets'),
+        # #     '-s',os.path.join(dirname, 'tagsets'),'-o',os.path.join(dirname, 'results'), '-i', os.path.join(dirname, 'iter_model.vw'), '-l'], 
+        # #     stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+        # # p3 = subprocess.Popen(['python3', os.path.join(dirname, 'main.py'),'-t',os.path.join(dirname, 'demo_tagsets/iter_init'),
+        # #     '-s',os.path.join(dirname, 'demo_tagsets/sl_test_tag'),'-o',os.path.join(dirname, 'results'), '-i', os.path.join(dirname, 'iter_model.vw'), '-l'], 
+        # #     stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+        # (output, err) = p3.communicate()
+        # print(output, err)
+        # print("!!!!!!!!!!!!")
         return out
 
 

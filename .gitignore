@@ -90,3 +90,14 @@ ENV/
 
 # repository packages
 rp/
+
+# Temp files
+RTQA/iPython/Praxi/changesets/
+RTQA/iPython/Praxi/tagsets/
+RTQA/iPython/Praxi/demo_tagsets/
+RTQA/iPython/Praxi/*-changesets/
+RTQA/iPython/Praxi/*-tagsets/
+RTQA/iPython/Praxi/*-results/
+RTQA/iPython/Praxi/iter_model.p
+RTQA/iPython/Praxi/iter_model.vw
+RTQA/iPython/a.cache
