@@ -120,7 +120,8 @@ class ExecutionMagics(Magics):
         dirname = os.path.dirname(__file__)
         # Start Deltashocker filesystem change recorder
         # p = subprocess.Popen(['python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(dirname, 'changesets'),'-l',time_string], stdin=subprocess.PIPE)
-        p = subprocess.Popen(['python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(dirname, 'changesets'),'-l', *package_names], stdin=subprocess.PIPE)
+        # p = subprocess.Popen(['python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(dirname, 'changesets'),'-l', *package_names], stdin=subprocess.PIPE)
+        p = subprocess.Popen(['python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(dirname),'-l', *package_names], stdin=subprocess.PIPE)
 
         expr_val=None
         if len(expr_ast.body)==1 and isinstance(expr_ast.body[0], ast.Expr):
@@ -191,11 +192,12 @@ class ExecutionMagics(Magics):
         p.communicate(input=b'\n')
 
         
-        # # tagset generator
-        # p2 = subprocess.Popen(['python3', os.path.join(dirname, 'tagset_gen.py'),'-c',os.path.join(dirname, 'changesets'),'-t',os.path.join(dirname, 'tagsets')], stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
-        # # main.py generates a trains a new model everytime from scratch from the tagsets it is given
-        # # demo_tagsets/<tagset_directory> is what vw is testing against the sample
-        # p2.communicate()
+        # tagset generator
+        labels_str = "-".join(package_names)
+        p2 = subprocess.Popen(['python3', os.path.join(dirname, 'tagset_gen.py'),'-c',os.path.join(dirname, labels_str+'-changesets'),'-t',os.path.join(dirname, labels_str+'-tagsets')], stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        # main.py generates a trains a new model everytime from scratch from the tagsets it is given
+        # demo_tagsets/<tagset_directory> is what vw is testing against the sample
+        p2.communicate()
 
         # # predictions generator
         # p3 = subprocess.Popen(['python3', os.path.join(dirname, 'main.py'),'-t',os.path.join(dirname, 'demo_tagsets/sl_train_tag'),

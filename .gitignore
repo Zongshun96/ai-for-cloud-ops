@@ -101,3 +101,6 @@ RTQA/iPython/Praxi/*-results/
 RTQA/iPython/Praxi/iter_model.p
 RTQA/iPython/Praxi/iter_model.vw
 RTQA/iPython/a.cache
+RTQA/iPython/Praxi/data/
+RTQA/iPython/Praxi/data_bak/
+RTQA/iPython/Praxi/temp_data/

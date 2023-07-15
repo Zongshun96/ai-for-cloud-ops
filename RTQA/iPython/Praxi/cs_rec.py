@@ -70,10 +70,14 @@ if __name__ == '__main__':
 
     args = vars(parser.parse_args())
 
-    targetdir = args['targetdir']
+    
     labels = args['label']
+    labels_str = "-".join(labels)
+    targetdir = args['targetdir'] + "/" + labels_str+"-changesets"
+    if not os.path.exists(targetdir):
+        os.makedirs(targetdir)
     print("label, targetdir", labels, targetdir)
-    yaml_name = get_free_filename("-".join(labels), targetdir, suffix='.yaml')
+    yaml_name = get_free_filename(labels_str, targetdir, suffix='.yaml')
 
     # Get linux watch path 
     # watch_path = sysconfig.get_paths()["purelib"]
