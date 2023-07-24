@@ -14,7 +14,7 @@ def praxi():
     # packages_l.extend(packages_l_1)
     # packages_l.extend(packages_l_2)
 
-    packages_l = ["opacus"]
+    packages_l = ["tdqm"]
     from itertools import combinations
     # for length in range(1, len(packages_l)+1):
     for length in range(1, 2):
