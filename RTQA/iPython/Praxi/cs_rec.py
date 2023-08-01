@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
     # Get linux watch path 
     # watch_path = sysconfig.get_paths()["purelib"]
-    watch_path = '/home/cc/Praxi-study/data_gen_venv/venv/lib/python3.9/site-packages/'
+    watch_path = '/home/ubuntu/ai-for-cloud-ops/changeset_gen_venv/venv/lib/python3.10/site-packages/'
 
     print("Watching:" + watch_path)
     watch_paths = [watch_path]

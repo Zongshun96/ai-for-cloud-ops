@@ -6,21 +6,24 @@ from datetime import datetime
 
 
 def praxi():
-    packages_l = ["wrapt", "attrs", "fsspec", "MarkupSafe", "grpcio-status", "cffi", "click", "PyJWT", "pytz", "pyasn1", "s3fs", "yarl", "psutil", "tomli", "isodate", "jsonschema", "grpcio", "soupsieve", "frozenlist", "cachetools", "botocore", "awscli", "pyyaml", "rsa", "s3transfer", "urllib3", "setuptools", "typing-extensions", "charset-normalizer", "idna", "python-dateutil", "google-api-core", "cryptography", "importlib-metadata", "emoji", "tdqm", "Flask", "seaborn", "NLTK", "pytest", "zipp", "authlib", "pycparser", "colorama", "oauthlib"]
-    packages_l_0 = ["pandas", "pillow", "matplotlib", "scipy", "boto3", "cmake", "nvidia-cuda-nvrtc-cu11", "jinja2", "nvidia-cuda-runtime-cu11", "wheel", "triton==2.0.0", "scikit-learn", ]
-    packages_l_1 = ["requests", "Scrapy", "six", "opencv-python", "simplejson", "opacus", "redis", "astropy", "biopython", "bokeh", "dask", "deap", "pyspark", "nilearn", "networkx", "SQLAlchemy"]
-    packages_l_2 = ["scikit-image", "scoop", "Theano", "beautifulsoup4", "Scrapy", "plotly", "pycaret", "mahotas", "statsmodels"]
-    packages_l.extend(packages_l_0)
-    packages_l.extend(packages_l_1)
-    packages_l.extend(packages_l_2)
+    # packages_l = ["wrapt", "attrs", "fsspec", "MarkupSafe", "grpcio-status", "cffi", "click", "PyJWT", "pytz", "pyasn1", "s3fs", "yarl", "psutil", "tomli", "isodate", "jsonschema", "grpcio", "soupsieve", "frozenlist", "cachetools", "botocore", "awscli", "pyyaml", "rsa", "s3transfer", "urllib3", "setuptools", "typing-extensions", "charset-normalizer", "idna", "python-dateutil", "google-api-core", "cryptography", "importlib-metadata", "emoji", "tdqm", "Flask", "seaborn", "NLTK", "pytest", "zipp", "authlib", "pycparser", "colorama", "oauthlib"]
+    # packages_l_0 = ["pandas", "pillow", "matplotlib", "scipy", "boto3", "cmake", "nvidia-cuda-nvrtc-cu11", "jinja2", "nvidia-cuda-runtime-cu11", "wheel", "triton==2.0.0", "scikit-learn", ]
+    # packages_l_1 = ["requests", "Scrapy", "six", "opencv-python", "simplejson", "opacus", "redis", "astropy", "biopython", "bokeh", "dask", "deap", "pyspark", "nilearn", "networkx", "SQLAlchemy"]
+    # packages_l_2 = ["scikit-image", "scoop", "Theano", "beautifulsoup4", "Scrapy", "plotly", "pycaret", "mahotas", "statsmodels"]
+    # packages_l.extend(packages_l_0)
+    # packages_l.extend(packages_l_1)
+    # packages_l.extend(packages_l_2)
+    packages_l = ["wrapt", "attrs", "fsspec", "MarkupSafe", "grpcio-status", "cffi"]
+    packages_l_3 = ["azure-core", "greenlet", "filelock", "pluggy", "paramiko"]
+    packages_l.extend(packages_l_3)
     from itertools import combinations
     # for length in range(1, len(packages_l)+1):
-    for length in range(2, 4):
+    for length in range(1, 3):
         for package_names in combinations(packages_l, length):
-            for _ in range(20):
+            for _ in range(2):
                 packages_str = " ".join(package_names)
-                cmd1 = "/home/cc/Praxi-study/data_gen_venv/venv/bin/python3 -m pip install "+packages_str
-                cmd2 = "/home/cc/Praxi-study/data_gen_venv/venv/bin/python3 -m pip uninstall -y " +packages_str
+                cmd1 = "/home/ubuntu/ai-for-cloud-ops/changeset_gen_venv/venv/bin/python3.10 -m pip install "+packages_str
+                cmd2 = "/home/ubuntu/ai-for-cloud-ops/changeset_gen_venv/venv/bin/python3.10 -m pip uninstall -y " +packages_str
                 print(cmd1)
                 print(cmd2)
                 
@@ -42,7 +45,7 @@ def praxi():
                 # Start Deltashocker filesystem change recorder
                 # p = subprocess.Popen(['python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(dirname, 'changesets'),'-l',time_string], stdin=subprocess.PIPE)
                 # p = subprocess.Popen(['python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(dirname, 'changesets'),'-l', *package_names], stdin=subprocess.PIPE)
-                p = subprocess.Popen(['/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/.venv/bin/python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(out_dirname),'-l', *package_names], stdin=subprocess.PIPE)
+                p = subprocess.Popen(['/home/ubuntu/Praxi-Pipeline/venv/bin/python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(out_dirname),'-l', *package_names], stdin=subprocess.PIPE)
 
                 # install packages
                 p_cmd1 = subprocess.Popen(cmd1.split(" "), stdin=subprocess.PIPE)
@@ -56,7 +59,7 @@ def praxi():
                 
                 # tagset generator
                 labels_str = "-".join(package_names)
-                p2 = subprocess.Popen(['/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/.venv/bin/python3', os.path.join(dirname, 'tagset_gen.py'),'-c',os.path.join(out_dirname, labels_str+'-changesets'),'-t',os.path.join(out_dirname, labels_str+'-tagsets')], stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                p2 = subprocess.Popen(['/home/ubuntu/Praxi-Pipeline/venv/bin/python3', os.path.join(dirname, 'tagset_gen.py'),'-c',os.path.join(out_dirname, labels_str+'-changesets'),'-t',os.path.join(out_dirname, labels_str+'-tagsets')], stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
                 # main.py generates a trains a new model everytime from scratch from the tagsets it is given
                 # demo_tagsets/<tagset_directory> is what vw is testing against the sample
                 p2.communicate()
