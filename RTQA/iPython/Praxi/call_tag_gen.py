@@ -14,7 +14,7 @@ def praxi():
     # packages_l.extend(packages_l_1)
     # packages_l.extend(packages_l_2)
 
-    packages_l = ["tdqm"]
+    packages_l = ["mahotas"]
     from itertools import combinations
     # for length in range(1, len(packages_l)+1):
     for length in range(1, 2):
@@ -44,7 +44,7 @@ def praxi():
                 # # Start Deltashocker filesystem change recorder
                 # # p = subprocess.Popen(['python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(dirname, 'changesets'),'-l',time_string], stdin=subprocess.PIPE)
                 # # p = subprocess.Popen(['python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(dirname, 'changesets'),'-l', *package_names], stdin=subprocess.PIPE)
-                # p = subprocess.Popen(['/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/.venv/bin/python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(out_dirname),'-l', *package_names], stdin=subprocess.PIPE)
+                # p = subprocess.Popen(['/home/cc/Praxi-study/Praxi-Pipeline/venv/bin/python3', os.path.join(dirname, 'cs_rec.py'),'-t',os.path.join(out_dirname),'-l', *package_names], stdin=subprocess.PIPE)
 
                 # # install packages
                 # p_cmd1 = subprocess.Popen(cmd1.split(" "), stdin=subprocess.PIPE)
@@ -59,7 +59,7 @@ def praxi():
                 # tagset generator
                 labels_str = "-".join(package_names)
                 print(os.path.join(out_dirname, labels_str+'-changesets'))
-                p2 = subprocess.Popen(['/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/.venv/bin/python3', os.path.join(dirname, 'tagset_gen.py'),'-c',os.path.join(out_dirname, labels_str+'-changesets'),'-t',os.path.join(out_dirname, labels_str+'-tagsets')], stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+                p2 = subprocess.Popen(['/home/cc/Praxi-study/Praxi-Pipeline/venv/bin/python3', os.path.join(dirname, 'tagset_gen.py'),'-c',os.path.join(out_dirname, labels_str+'-changesets'),'-t',os.path.join(out_dirname, labels_str+'-tagsets')], stdin=subprocess.PIPE, stderr=subprocess.PIPE)
                 # main.py generates a trains a new model everytime from scratch from the tagsets it is given
                 # demo_tagsets/<tagset_directory> is what vw is testing against the sample
                 out, err = p2.communicate()
