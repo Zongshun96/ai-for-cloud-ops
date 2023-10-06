@@ -36,9 +36,12 @@ def get_free_filename(stub, directory, suffix=''):
                 Path(file_candidate).mkdir()
             return file_candidate
 
-def json_to_yaml(fname, yamlname, labels=None):
-    with open(fname) as json_file:
-        data = json.load(json_file)
+def json_to_yaml(fname, yamlname, json_data=None, labels=None):
+    if json_data == None:
+        with open(fname) as json_file:
+            data = json.load(json_file)
+    else:
+        data = data = json.loads(json_data)
 
     changes = set()
     open_time = data['open_time']
@@ -65,6 +68,7 @@ if __name__ == '__main__':
     # Command line arguments!
     parser = argparse.ArgumentParser(description='Arguments for Praxi software discovery algorithm.')
 
+    parser.add_argument('-w', '--watch_path', type=str, default='/home/cc/Praxi-study/data_gen_venv/venv/lib/python3.10/site-packages/', help='Watch path', required=True)
     parser.add_argument('-t','--targetdir', help='Path to target directory.', required=True)
     parser.add_argument('-l', '--label', nargs="*", type=str, default=['pandas', 'matplotlib'], help='Application label', required=True)
 
@@ -81,7 +85,7 @@ if __name__ == '__main__':
 
     # Get linux watch path 
     # watch_path = sysconfig.get_paths()["purelib"]
-    watch_path = '/home/cc/Praxi-study/data_gen_venv/venv/lib/python3.8/site-packages/'
+    watch_path = args['watch_path']
 
     print("Watching:" + watch_path)
     watch_paths = [watch_path]
@@ -94,12 +98,15 @@ if __name__ == '__main__':
     # Save changeset
     cs = dswd.mark()
     print(cs)
-    io.save_object_as_json(cs, 'cs.dscs')
+    # io.save_object_as_json(cs, 'cs.dscs')
+    cs_json = io.ret_object_as_json(cs)
 
-    json_to_yaml('cs.dscs', yaml_name, labels=labels)
+    print("json_to_yaml", yaml_name)
+    json_to_yaml('cs.dscs', yaml_name, json_data=cs_json, labels=labels)
+    # json_to_yaml('cs.dscs', yaml_name, labels=labels)
 
-    # Remove json file
-    os.remove("cs.dscs")
+    # # Remove json file
+    # os.remove("cs.dscs")
     print("done")
 
     del dswd

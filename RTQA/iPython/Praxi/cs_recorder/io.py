@@ -519,6 +519,12 @@ def save_object_as_json(obj: object, save_path: str):
     with open(save_path, 'w') as output_file:
         print(DSEncoder().encode(obj), file=output_file)
 
+def ret_object_as_json(obj: object):
+    """
+    Basically return a text representation of select DeltaSherlock objects.
+    """
+    return DSEncoder().encode(obj)
+
 def uid(size=6, chars=string.ascii_uppercase + string.digits):
     """
     Generates a nice short unique ID for random files. For testing
