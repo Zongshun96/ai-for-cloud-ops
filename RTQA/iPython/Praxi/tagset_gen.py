@@ -77,7 +77,7 @@ def get_changeset(cs_fname, cs_dir):
         logging.error("No changesets match the name %s", str(csfile))
         raise IOError("No changesets match the name")
     if 'changes' not in changeset or ('label' not in changeset and 'labels' not in changeset):
-        logging.error("Couldn't read changeset")
+        logging.error("Couldn't read changeset%s", str(csfile))
         raise IOError("Couldn't read changeset")
     return changeset
 

@@ -51,7 +51,7 @@ def praxi(packages_l, packages_l_1=None, venv_dir="/home/cc/Praxi-study/data_gen
         packages_str = " ".join(package_names)
         dirname = os.path.dirname(__file__)
         # # out_dirname = dirname
-        out_dirname = dirname+"/data3_par_test"
+        out_dirname = dirname+"/data_3"
 
         logger = build_logger(labels_str, os.path.join(out_dirname, labels_str+'-changesets/'))
         
@@ -167,6 +167,16 @@ def praxi(packages_l, packages_l_1=None, venv_dir="/home/cc/Praxi-study/data_gen
         # print("!!!!!!!!!!!!")
     return
 
+
+def rm_changesets(pathname, package_chk_l):
+    labels_str = "-".join([package_chk for package_chk in package_chk_l])
+    dirname = labels_str+"-changesets/"
+    for file in os.listdir(pathname+dirname):
+        filename = os.fsdecode(file)
+        if filename.endswith(".yaml"):
+            file_to_rem = Path(pathname+dirname+file)
+            file_to_rem.unlink()
+
 def is_not_enough_changeset(pathname, package_chk_l, count=2):
     labels_str = "-".join([package_chk for package_chk in package_chk_l])
     dirname = labels_str+"-changesets/"
@@ -178,6 +188,7 @@ def is_not_enough_changeset(pathname, package_chk_l, count=2):
         if Path(pathname+tagdirname).is_dir():
             dir_to_rem = Path(pathname+dirname)
             dir_to_rem.rmdir()
+            print(pathname+dirname+" is deleted!")
         return package_chk_l, yaml_count < count, tag_count < count
     for file in os.listdir(pathname+dirname):
         filename = os.fsdecode(file)
@@ -185,12 +196,14 @@ def is_not_enough_changeset(pathname, package_chk_l, count=2):
             with open(pathname+dirname+file, "rb") as fd:
                 d = yaml.load(fd, Loader=yaml.Loader)
                 # print(0)
-                if d == None or 'changes' not in d or len(d['changes']) == 0:
+                if d == None or 'changes' not in d or 'labels' not in d or len(d['changes']) == 0 or len(d['labels']) != len(package_chk_l):
                     file_to_rem = Path(pathname+dirname+file)
                     file_to_rem.unlink()
+                    print(pathname+dirname+file+" is deleted!")
                     file_to_rem = Path(pathname+tagdirname+file[:-5]+".tag")
                     if file_to_rem.is_file():
                         file_to_rem.unlink()
+                        print(pathname+tagdirname+file[:-5]+".tag"+" is deleted!")
 
                     # for file in os.listdir(pathname+dirname):
                     #     file_to_rem = Path(pathname+dirname+file)
@@ -208,20 +221,28 @@ def is_not_enough_changeset(pathname, package_chk_l, count=2):
                     yaml_count += 1
     if not Path(pathname+tagdirname).is_dir():
         return package_chk_l, yaml_count < count, tag_count < count
-    tag_count = yaml_count
+    # tag_count = yaml_count
     for file in os.listdir(pathname+tagdirname):
         filename = os.fsdecode(file)
         if filename.endswith(".tag"):
             if file[:-4]+".yaml" not in yaml_set:
                 file_to_rem = Path(pathname+tagdirname+file)
+                print(pathname+tagdirname+file+" is deleted!")
                 file_to_rem.unlink()
-            with open(pathname+tagdirname+file, "rb") as fd:
-                d = yaml.load(fd, Loader=yaml.Loader)
-                # print(0)
-                if d == None or 'tags' not in d or len(d['tags']) == 0:
-                    tag_count -= 1
-                    file_to_rem = Path(pathname+tagdirname+file)
-                    file_to_rem.unlink()
+            try:
+                with open(pathname+tagdirname+file, "rb") as fd:
+                    d = yaml.load(fd, Loader=yaml.Loader)
+                    # print(0)
+                    if d == None or 'tags' not in d or len(d['tags']) == 0:
+                        # tag_count -= 1
+                        file_to_rem = Path(pathname+tagdirname+file)
+                        print(pathname+tagdirname+file+" is deleted!")
+                        file_to_rem.unlink()
+                    else:
+                        tag_count += 1
+            except:
+                print(pathname+tagdirname+file+" already gone!")
+        
     if yaml_count < count or tag_count < count:
         return package_chk_l, yaml_count < count, tag_count < count
 
@@ -346,7 +367,7 @@ if __name__ == '__main__':
     with open('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/packages_l_4.txt', 'w') as f:
         for line in packages_l_4:
             f.write(f"{line}\n")
-    print(packages_l_4)
+    # print(packages_l_4)
 
 
     # package_ls = [packages_l_4[(sublist_idx-1)*10:sublist_idx*10] for sublist_idx in range(1,len(packages_l_4)//10+2)]
@@ -360,13 +381,13 @@ if __name__ == '__main__':
     # pool = mp.Pool(processes=sum(1 for _ in product(package_ls, packages_l_0s)))
     # results = [pool.apply(praxi, args=(package_l, package_l_1), kwds={"venv_dir":"/home/cc/Praxi-study/data_gen_venv_"+str(p_l_idx)+"/venv/"}) for p_l_idx, (package_l, package_l_1) in enumerate(product(package_ls, packages_l_0s))]
 
-    pool = mp.Pool(processes=mp.cpu_count()//2)
-    # pool = mp.Pool(processes=5)
+    pool = mp.Pool(processes=mp.cpu_count())
+    # pool = mp.Pool(processes=1)
     # results = [pool.apply_async(praxi, args=([package],), kwds={"venv_dir":"/home/cc/Praxi-study/data_gen_venv_0"+str(p_l_idx)+"/venv/", "length":1}) for p_l_idx, (package) in enumerate(packages_l_4)]
     # results = [pool.apply_async(praxi, args=([package], [package_1]), kwds={"venv_dir":"/home/cc/Praxi-study/data_gen_venv_0"+str(p_l_idx)+"/venv/"}) for p_l_idx, (package, package_1) in enumerate(combinations(packages_l_4, 2))]
     # results = [pool.apply_async(praxi, args=([package], [package_1]), kwds={"venv_dir":"/home/cc/Praxi-study/data_gen_venv_"+str(p_l_idx)+"/venv/"}) for p_l_idx, (package, package_1) in enumerate(product(packages_l_4_0, packages_l_4))]
 
-    packages_miss_l = [pool.apply_async(is_not_enough_changeset, args=('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/data3_par_test/', package_chk_l), kwds={"count":2}) for p_l_idx, (package_chk_l) in enumerate(combinations(packages_l_4, 2))]
+    packages_miss_l = [pool.apply_async(is_not_enough_changeset, args=('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/data_3/', package_chk_l), kwds={"count":2}) for p_l_idx, (package_chk_l) in enumerate(combinations(packages_l_4, 2))]
     packages_miss_l = [res.get()[0] for res in packages_miss_l if res.get()!=None]
     print(packages_miss_l)
     with open("/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/packages_miss_l.obj","wb") as filehandler:
@@ -377,31 +398,32 @@ if __name__ == '__main__':
     # with open("/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/packages_miss_l.obj","rb") as filehandler:
     #     packages_miss_l = pickle.load(filehandler)
     # print(packages_miss_l)
+    # # packages_miss_l = [pool.apply_async(rm_changesets, args=('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/data_3/', package_chk_l)) for p_l_idx, package_chk_l in enumerate(packages_miss_l)]
     # results = [pool.apply_async(praxi, args=(package_miss_l, ), kwds={"venv_dir":"/home/cc/Praxi-study/data_gen_venv_0"+str(p_l_idx)+"/venv/", "length":2, "repetition":2}) for p_l_idx, package_miss_l in enumerate(packages_miss_l)]
     
-    packages_miss_l = [pool.apply_async(is_not_enough_changeset, args=('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/data3_par_test/', [package_chk_l]), kwds={"count":25}) for p_l_idx, package_chk_l in enumerate(packages_l_4)]
-    packages_miss_l = [res.get()[0] for res in packages_miss_l if res.get()!=None]
-    print(packages_miss_l)
-    with open("/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/packages_miss_l_SL.obj","wb") as filehandler:
-        pickle.dump(packages_miss_l, filehandler)
-    with open('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/packages_miss_l_SL.txt', 'w') as f:
-        for line in packages_miss_l:
-            f.write(f"{line}\n")
+    # packages_miss_l = [pool.apply_async(is_not_enough_changeset, args=('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/data_3/', [package_chk_l]), kwds={"count":25}) for p_l_idx, package_chk_l in enumerate(packages_l_4)]
+    # packages_miss_l = [res.get()[0] for res in packages_miss_l if res.get()!=None]
+    # print(packages_miss_l)
+    # with open("/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/packages_miss_l_SL.obj","wb") as filehandler:
+    #     pickle.dump(packages_miss_l, filehandler)
+    # with open('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/packages_miss_l_SL.txt', 'w') as f:
+    #     for line in packages_miss_l:
+    #         f.write(f"{line}\n")
     # with open("/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/packages_miss_l_SL.obj","rb") as filehandler:
     #     packages_miss_l = pickle.load(filehandler)
     # print(packages_miss_l)
-    # results = [pool.apply_async(praxi, args=(package_miss_l, ), kwds={"venv_dir":"/home/cc/Praxi-study/data_gen_venv_1"+str(p_l_idx)+"/venv/", "length":1, "repetition":27}) for p_l_idx, package_miss_l in enumerate(packages_miss_l)]
+    # results = [pool.apply_async(praxi, args=(package_miss_l, ), kwds={"venv_dir":"/home/cc/Praxi-study/data_gen_venv_1"+str(p_l_idx)+"/venv/", "length":1, "repetition":0}) for p_l_idx, package_miss_l in enumerate(packages_miss_l)]
 
     pool.close()
     pool.join()
 
     # packages_miss_l = []
     # for p_l_idx, package_chk_l in enumerate(combinations(packages_l_4, 2)):
-    #     ret = is_not_enough_changeset('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/data3_par_test/', package_chk_l)
+    #     ret = is_not_enough_changeset('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/data_3/', package_chk_l)
     #     if ret != None:
     #         packages_miss_l.append(ret)
     #         break
-    #     # packages_miss_l = [pool.apply_async(is_not_enough_changeset, args=('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/data3_par_test/', package_chk_l)) for p_l_idx, (package_chk_l) in enumerate(combinations(packages_l_4, 2))]
+    #     # packages_miss_l = [pool.apply_async(is_not_enough_changeset, args=('/home/cc/Praxi-study/ai-for-cloud-ops/RTQA/iPython/Praxi/data_3/', package_chk_l)) for p_l_idx, (package_chk_l) in enumerate(combinations(packages_l_4, 2))]
         
     # print(0)
     # for p_l_idx, package_miss_l in enumerate(packages_miss_l):
